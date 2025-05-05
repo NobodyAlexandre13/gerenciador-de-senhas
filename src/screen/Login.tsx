@@ -8,6 +8,7 @@ import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 
 import { FirebaseError } from "firebase/app";
@@ -66,12 +67,34 @@ export default function Login() {
           setAlert("O campo de email está vazio.");
         }else if (firebaseError.code === 'auth/network-request-failed') {
           setAlert("Conecta-te a internet por favor.");
+        }else if (firebaseError.code === 'auth/wrong-password') {
+          setAlert("Senha incorreta. Verifique e tente novamente.");
         } else {
           setAlert("Erro inesperado. Tente novamente mais tarde.");
           console.error("Erro ao criar conta:", firebaseError);
         }
       }finally{
         setLoading(false);
+      }
+    }
+  }
+  async function resetPassword(){
+    if(email === ""){
+      Alert.alert("Email não existente", "Adiciona o teu email para poder recuperar a senha");
+    }else{
+      try {
+        await sendPasswordResetEmail(auth, email);
+        Alert.alert("E-mail de recuperação enviado com sucesso!");
+      } catch (error) {
+        const firebaseError = error as FirebaseError;
+        
+        if (firebaseError.code === "auth/user-not-found") {
+          Alert.alert("E-mail não encontrado.");
+        } else if (firebaseError.code === "auth/invalid-email") {
+          Alert.alert("E-mail inválido.");
+        } else {
+          Alert.alert("Erro ao enviar e-mail. Tente novamente.");
+        }
       }
     }
   }
@@ -88,26 +111,28 @@ export default function Login() {
         <Text className='text-base text-primary uppercase'>Gerador de Senhas</Text>
       </View>
 
-      <View className='w-full px-8 mt-7 mb-2'>
-        <TouchableOpacity 
-          className='bg-primary flex-row justify-center items-center p-3 w-full rounded-md gap-3'
-        >
-          <AntDesign name="googleplus" size={28} color="white" />
-          <Text className='font-medium text-card text-lg'>Login com google</Text>
-        </TouchableOpacity>
-      </View>
       <View className='w-full px-8'>
         <Text className='text-error font-bold text-sm'>{alert}</Text>
         <Input 
           title='Email'
           value={email}
+          keyboardType='email-address'
           onChangeText={setEmail}
         />
         <Input 
           title='Senha'
+          secureTextEntry
           value={senha}
           onChangeText={setSenha}
         />
+
+        <TouchableOpacity 
+          className='pt-2 items-end'
+          onPress={resetPassword}
+        >
+          <Text className='text-primary font-bold'>Esqueci a minha palavra-passe</Text>
+        </TouchableOpacity>
+
         {loading ? (
           <Loading color={themes.colors.btn} />
         ) : (
