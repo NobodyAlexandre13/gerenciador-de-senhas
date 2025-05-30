@@ -134,9 +134,9 @@ export function Home(){
                             buscarSenhaPorId(item.id)
                         }} date={item} />}
                         ListEmptyComponent={
-                        <Text className="text-textSecondary font-regular text-base text-center mt-4">
-                            Nenhuma senha guardada.
-                        </Text>
+                            <Text className="text-textSecondary font-regular text-base text-center mt-4">
+                                Nenhuma senha guardada.
+                            </Text>
                         }
                         showsVerticalScrollIndicator={false}
                     />

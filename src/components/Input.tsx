@@ -11,7 +11,7 @@ export function Input( { title, ...rest}: Props){
             <TextInput 
                 {...rest}
                 placeholder={title}
-                className="bg-card w-full p-4 mt-3 rounded-md"
+                className="bg-card w-full p-4 mt-3 rounded-md h-14"
             />
         </View>
     )

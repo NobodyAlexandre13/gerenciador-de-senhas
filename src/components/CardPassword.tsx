@@ -26,16 +26,32 @@ export function CardPassword( { date, onPress }: Props){
         Alert.alert("Copiado", "Senha copiada para a área de transferência.");
     }
       
-
-    async function handleDeletePass(id: string){
+    async function RemovePassword(id: string){
         try{
             const docRef = doc(firestore, 'senhas', id);
             await deleteDoc(docRef);
-
-            console.log("Bem eliminado");
+            Alert.alert("Removido com sucesso!!");
         }catch(error){
-            console.error("Erro ao excluir senha: ", error);
+            console.error("Erro ao excluir a senha: ", error);
         }
+    }
+
+    function handleDeletePass(id: string){
+        Alert.alert(
+            "Confirmar ação", 
+            "Tens certeza que desejas excluir esta senha?",
+            [
+                {
+                    text: 'Sim',
+                    onPress: () => RemovePassword(id)
+                },
+                {
+                    text: 'Não',
+                    style: 'cancel'
+                }
+            ],
+            { cancelable: true }
+        )
     }
 
     return(
@@ -43,7 +59,7 @@ export function CardPassword( { date, onPress }: Props){
             <View>
                 <Text className="font-medium text-textSecondary text-base">{date.plat}</Text>
                 <View className="flex-row justify-between mt-2">
-                    <Text className="font-bold text-xl text-textPrimary ">{date.senha}</Text>
+                    <Text numberOfLines={1} className="font-bold text-xl text-textPrimary ">{date.senha}</Text>
                     <TouchableOpacity
                         onPress={copyPass}
                     >

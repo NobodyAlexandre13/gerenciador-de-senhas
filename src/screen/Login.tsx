@@ -34,6 +34,12 @@ export default function Login() {
   const [alert, setAlert] = useState("");
   const [ loading, setLoading ] = useState(false);
 
+  function cleanInput (){
+    setEmail("");
+    setSenha("");
+    setAlert("");
+  }
+
   async function handleLogin (){
     if(email === "" || senha === ""){
       setAlert("Preeche todos os campos!");
@@ -44,11 +50,10 @@ export default function Login() {
         const user = userCredential.user;
 
         const id = user.uid;
-        setAlert("");
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
         navigation.navigate('Home', { userId: id });
-        setEmail("");
-        setSenha("");
+
+        cleanInput();
       }catch( error ){
         const firebaseError = error as FirebaseError;
 
@@ -62,6 +67,8 @@ export default function Login() {
           const id = login.user.uid;
 
           navigation.navigate('Home', { userId: id });
+
+          cleanInput();
 
         } else if (firebaseError.code === 'auth/missing-email') {
           setAlert("O campo de email está vazio.");
@@ -78,6 +85,7 @@ export default function Login() {
       }
     }
   }
+
   async function resetPassword(){
     if(email === ""){
       Alert.alert("Email não existente", "Adiciona o teu email para poder recuperar a senha");

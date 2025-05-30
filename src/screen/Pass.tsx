@@ -107,6 +107,7 @@ export function Pass(){
                     value={plataforma}
                     onChangeText={setPlataforma}
                 />
+
                 <Input 
                     title="Usuário ou email"
                     value={user}
