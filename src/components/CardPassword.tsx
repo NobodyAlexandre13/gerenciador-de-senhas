@@ -9,20 +9,24 @@ import * as Clipboard from 'expo-clipboard';
 
 import { deleteDoc, doc } from 'firebase/firestore';
 
-interface Props{
-    date: {
-        id: string;
-        plat: string;
-        usuario: string;
-        senha: string;
-    },
+interface Props {
+    id: string;
+    plat: string;
+    usuario: string;
+    senha: string;
     onPress: () => void;
 }
 
-export function CardPassword( { date, onPress }: Props){
+export function CardPassword( { 
+    id, 
+    plat,
+    usuario,
+    senha, 
+    onPress 
+}: Props){
 
     function copyPass() {
-        Clipboard.setStringAsync(date.senha);
+        Clipboard.setStringAsync(senha);
         Alert.alert("Copiado", "Senha copiada para a área de transferência.");
     }
       
@@ -38,7 +42,7 @@ export function CardPassword( { date, onPress }: Props){
 
     function handleDeletePass(id: string){
         Alert.alert(
-            "Confirmar ação", 
+            "Confirmar ação",
             "Tens certeza que desejas excluir esta senha?",
             [
                 {
@@ -57,9 +61,9 @@ export function CardPassword( { date, onPress }: Props){
     return(
         <View className="w-full bg-card p-4 rounded mb-2">
             <View>
-                <Text className="font-medium text-textSecondary text-base">{date.plat}</Text>
+                <Text className="font-medium text-textSecondary text-base">{plat}</Text>
                 <View className="flex-row justify-between mt-2">
-                    <Text numberOfLines={1} className="font-bold text-xl text-textPrimary ">{date.senha}</Text>
+                    <Text numberOfLines={1} className="font-bold text-xl text-textPrimary ">{senha}</Text>
                     <TouchableOpacity
                         onPress={copyPass}
                     >
@@ -67,7 +71,7 @@ export function CardPassword( { date, onPress }: Props){
                     </TouchableOpacity>
                 </View>
 
-                <Text className="font-medium text-sm text-textSecondary">{date.usuario}</Text>
+                <Text className="font-medium text-sm text-textSecondary">{usuario}</Text>
 
                 <View className="flex-row justify-between w-full mt-4">
                     <TouchableOpacity 
@@ -85,7 +89,7 @@ export function CardPassword( { date, onPress }: Props){
                         style={{
                             width: '48%'
                         }}
-                        onPress={() => handleDeletePass(date.id)}
+                        onPress={() => handleDeletePass(id)}
                     >
                         <MaterialIcons name="delete" size={24} color="white" />
                         <Text className="text-card font-regular">Excluir</Text>

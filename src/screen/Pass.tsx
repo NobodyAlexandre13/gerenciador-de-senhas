@@ -99,7 +99,6 @@ export function Pass(){
                         Gerar e guardar senha
                     </Text>
                 </View>
-                
             </View>
             <View className="px-8 mt-3">
                 <Input

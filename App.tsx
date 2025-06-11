@@ -23,10 +23,11 @@ export default function App() {
 
   if(!loadedFonts){
       return(
-        <View className='
-          flex-1 
-          justify-center 
-          items-center
+        <View 
+          className='
+            flex-1
+            justify-center 
+            items-center
           '
         >
           <Loading color={themes.colors.primary} />

@@ -18,6 +18,8 @@ Cripto Key é um aplicativo mobile desenvolvido com React Native Expo que permit
 
 🔐 Recuperação de conta por e-mail
 
+🔐 Autenticação local (Face Id e FingerPrint)
+
 # 📱Tecnologias usadas
 React Native
 

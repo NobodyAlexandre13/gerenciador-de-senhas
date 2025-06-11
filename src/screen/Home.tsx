@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { RouteProp, useRoute } from '@react-navigation/native';
 
-import { FlatList, Modal, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Modal, Text, TouchableOpacity, View, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/navigation';
+
+import * as LocalAuthentication from 'expo-local-authentication';
 
 import { collection, query, where, onSnapshot, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { firestore, auth } from '../firebaseConfig';
@@ -18,6 +20,7 @@ import { themes } from "../styles/themes";
 import { StatusBar } from "expo-status-bar";
 import { CardPassword } from "../components/CardPassword";
 import { Input } from "../components/Input";
+import { CardAcessPassword } from "../components/CardAcessPassword";
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
@@ -27,10 +30,12 @@ export function Home(){
     const route = useRoute<HomeScreenRouteProp>();
     const [senhasCarregadas, setSenhasCarregadas] = useState<any[]>([]);
     const [ visibleModal, setVisibleModal ] = useState(false);
+    const [ id, setId ] = useState("");
     const [ senha, setSenha ] = useState("");
     const [ plataforma, setPlataforma ] = useState("");
     const [ usuario, setUsuario ] = useState("");
     const [ idUpdated, setIdUpdated ] = useState("");
+    const [ visiblePass, setVisiblePass ] = useState(false);
 
     const { userId } = route.params;
 
@@ -41,6 +46,23 @@ export function Home(){
     async function handleLogout(){
         await signOut(auth);
         navigation.goBack();
+    }
+
+    async function VerifyBiometric (id: string){
+        const isBiometricEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+        if(!isBiometricEnrolled){
+            return Alert.alert("Acesso negado", "Nenhuma biometria encontrada. Por favor cadastre no dispositivo!")
+        }
+
+        const auth = await LocalAuthentication.authenticateAsync({
+            promptMessage: "Acesso com biometria",
+            fallbackLabel: "Não reconhecido..."
+        });
+
+        if(auth.success){
+            return getPasswordShow(id);
+        }
     }
 
     useEffect(() => {
@@ -63,6 +85,29 @@ export function Home(){
         return () => unsubscribe();
     }, [userId]);
 
+    async function getPasswordShow(id: string){
+        console.log(id);
+        try{
+            const docRef = doc(firestore, "senhas", id);
+            const docSnap = await getDoc(docRef);
+
+            if(docSnap.exists()){
+                const dados = docSnap.data();
+
+                setId(id);
+                setPlataforma(dados.plat);
+                setUsuario(dados.usuario);
+                setSenha(dados.senha);
+                setVisiblePass(true);
+            }else{
+                console.log("Dados não encontrados..")
+            }
+        }catch(error){
+            console.error("Erro ao buscar senha:", error);
+            return null;
+        }
+    }
+
     async function buscarSenhaPorId(id: string) {
         try {
           const docRef = doc(firestore, "senhas", id);
@@ -71,6 +116,7 @@ export function Home(){
           if (docSnap.exists()) {
             const dados = docSnap.data();
 
+            
             setPlataforma(dados.plat);
             setUsuario(dados.usuario);
             setSenha(dados.senha);
@@ -129,10 +175,7 @@ export function Home(){
                     <FlatList
                         data={senhasCarregadas}
                         keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => <CardPassword onPress={() => {
-                            setIdUpdated(item.id)
-                            buscarSenhaPorId(item.id)
-                        }} date={item} />}
+                        renderItem={({ item }) => <CardAcessPassword date={item} onPress={() => VerifyBiometric(item.id)}/>}
                         ListEmptyComponent={
                             <Text className="text-textSecondary font-regular text-base text-center mt-4">
                                 Nenhuma senha guardada.
@@ -189,6 +232,37 @@ export function Home(){
                             </View>
                         </View>
                     </View>
+                </View>
+            </Modal>
+
+            <Modal
+                transparent
+                animationType="fade"
+                visible={visiblePass}
+            >
+                <View 
+                    className="justify-center px-4 flex-1"
+                    style={{
+                        backgroundColor: 'rgba(28, 29, 46, 0.7)'
+                    }}
+                >
+                    <CardPassword 
+                        onPress={() => {
+                            setIdUpdated(id)
+                            buscarSenhaPorId(id)
+                        }}
+                        senha={senha}
+                        plat={plataforma}
+                        usuario={usuario}
+                        id={id}
+                    />
+
+                    <TouchableOpacity 
+                        className="w-full justify-center items-center"
+                        onPress={() => setVisiblePass(false)}
+                    >
+                        <Feather name="x-circle" size={30} color="#fff" />
+                    </TouchableOpacity>
                 </View>
             </Modal>
         </View>
