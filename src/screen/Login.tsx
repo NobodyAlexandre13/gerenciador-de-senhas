@@ -109,7 +109,6 @@ export default function Login() {
           cleanInput();
         } else {
           setAlert("Erro inesperado. Tente novamente mais tarde.");
-          console.error("Erro ao criar conta:", firebaseError);
         }
       }finally{
         setLoading(false);
@@ -145,6 +144,8 @@ export default function Login() {
           setAlert("Conecta-te a internet por favor.");
         }else if (firebaseError.code === 'auth/wrong-password') {
           setAlert("Senha incorreta. Verifique e tente novamente.");
+        }else if(firebaseError.code === 'auth/email-already-in-use'){
+          setAlert("O email já está a ser usado...");
         } else {
           setAlert("Erro inesperado. Tente novamente mais tarde.");
           console.error("Erro ao criar conta:", firebaseError);
@@ -174,6 +175,11 @@ export default function Login() {
         }
       }
     }
+  }
+
+  function CloserSingUp() {
+    setVisibleSingup(false);
+    cleanInput();
   }
 
   return (
@@ -284,7 +290,7 @@ export default function Login() {
           >
             <TouchableOpacity 
                 className="w-full justify-center items-center"
-                onPress={() => setVisibleSingup(false)}
+                onPress={CloserSingUp}
             >
                 <Feather name="x-circle" size={30} color="#fff" />
             </TouchableOpacity>
